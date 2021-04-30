@@ -24,7 +24,8 @@ SPECS = nosys.specs
 CC = arm-none-eabi-gcc
 LD = arm-none-eabi-ld
 OC = arm-none-eabi-objcopy
-LDFLAGS = -Map=$(TARGET).map -T $(LINKER_FILE)
+#LDFLAGS = -Map=$(TARGET).map -T$(LINKER_FILE)
+LDFLAGS = -Wl,-Map=$(TARGET).map -T$(LINKER_FILE)
 CFLAGS = $(INCLUDES) -mcpu=$(CPU) -mthumb \
          -Wall -Werror -g -O0 --specs=$(SPECS) -std=c99
 SIZE=arm-none-eabi-size
@@ -39,18 +40,22 @@ OBJS:=$(SOURCES:.c=.o)
 .PHONY: compile-all
 compile-all: $(OBJS)
 
-
 .PHONY: build
-build: $(TARGET).bin
-	
-	
-$(TARGET).elf: $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^
+build: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET).elf $(OBJS)
+	$(OC) -O binary $(TARGET).elf $(TARGET).bin
 	$(SIZE) $(TARGET).elf
+	
+#.PHONY: build
+#build: $(TARGET).bin
 
+#$(TARGET).elf: $(OBJS)
+#	$(LD) $(LDFLAGS) -o $(TARGET).elf $(OBJS)
+#	$(SIZE) $(TARGET).elf
 
-$(TARGET).bin: $(TARGET).elf
-		$(OC) -O binary $^ $@ 
+#$(TARGET).bin: $(TARGET).elf
+#	$(OC) -O binary $(TARGET).elf $(TARGET).bin 
+	
 
 .PHONY: clean
 clean:

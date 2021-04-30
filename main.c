@@ -25,6 +25,8 @@
  	
  		/* Transmit a character to the serial port of pc */
  		uartSend('p');
+ 		
+ 		stringSend("Hello World!");
  	
 	 	/* Wait for a small delay */
  		delay_ms(1000);

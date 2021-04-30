@@ -70,7 +70,7 @@
  /*
  * Function : uartSend
  *
- * Description : ISend the character to the pc through UART0
+ * Description : Send the character to the pc through UART0
  *
  * Notes : This function is specific to the EK-TM4C1294XL board.
  *
@@ -87,3 +87,27 @@ void uartSend(char data)
 
 }
 
+
+ /*
+ * Function : stringSend
+ *
+ * Description : Send the string to the pc through UART0
+ *
+ * Notes : This function is specific to the EK-TM4C1294XL board.
+ *
+ * Returns : None
+ */
+
+void stringSend(char data[])
+{
+
+	uint16_t i;
+	
+	for(i=0; i<strlen(data); i++)
+	{
+
+		uartSend(data[i]);	
+		
+	}
+
+}

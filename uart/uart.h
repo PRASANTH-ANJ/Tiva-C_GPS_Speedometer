@@ -2,6 +2,7 @@
 #define __UART_H__
 
 #include <stdint.h>
+#include <string.h>
 #include "tm4c1294ncpdt.h"
 
 /* Macro defines*/
@@ -17,5 +18,7 @@
 void uartInit(void);
 
 void uartSend(char);
+
+void stringSend(char data[]);
 
 #endif
