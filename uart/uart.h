@@ -14,11 +14,21 @@
 #define EN_UART 0x01
 #define DIS_UART 0x00
 #define BUSY_FLAG 0x0000008
+#define OVERRUN_ERROR 0x00000800
+#define BREAK_ERROR 0x00000400
+#define PARITY_ERROR 0x00000200
+#define FRAME_ERROR 0x00000100
+#define DATA_BITS 0x000000FF
+#define RXFFULL 0x00000040
 
 void uartInit(void);
 
-void uartSend(char);
+void charSend(char);
 
 void stringSend(char data[]);
+
+char charReceive(void);
+
+void loopTest(void);
 
 #endif

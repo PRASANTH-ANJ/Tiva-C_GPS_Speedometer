@@ -14,22 +14,19 @@
  
  int main (void)
  {
- 
  	/* Initialize the timer module for delay_ms function */
  	timerInit();
  	
  	/* Initialize the UART0 module */
  	uartInit();
+ 	
+ 	stringSend("Initialization completed \n");
+ 	
+ 	stringSend("Entering while loop....\n");
  	while(1)
  	{
  	
- 		/* Transmit a character to the serial port of pc */
- 		uartSend('p');
- 		
- 		stringSend("Hello World!");
- 	
-	 	/* Wait for a small delay */
- 		delay_ms(1000);
+ 		loopTest();
  		
  	}
  	

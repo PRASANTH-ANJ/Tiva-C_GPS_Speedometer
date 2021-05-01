@@ -68,7 +68,7 @@
  }
  
  /*
- * Function : uartSend
+ * Function : charSend
  *
  * Description : Send the character to the pc through UART0
  *
@@ -77,7 +77,7 @@
  * Returns : None
  */
  
-void uartSend(char data)
+void charSend(char data)
 {
 	/* Place the data to be transmitted in the data register */
 	UART0_DR_R = data;
@@ -106,8 +106,84 @@ void stringSend(char data[])
 	for(i=0; i<strlen(data); i++)
 	{
 
-		uartSend(data[i]);	
+		charSend(data[i]);	
 		
 	}
 
 }
+
+
+/*
+ * Function : charReceive
+ *
+ * Description : Receive a character from the pc through UART0
+ *
+ * Notes : This function is specific to the EK-TM4C1294XL board.
+ *
+ * Returns : None
+ */
+ 
+ 
+ char charReceive(void)
+ {
+ 	/* Temporary storage variable for received data along with 4 error status bits */
+ 	uint16_t temp;
+ 	
+ 	/* Variable for extracted data field from 'temp'*/
+ 	char data;
+ 	
+ 	temp = UART0_DR_R;
+ 	
+ 	if(temp & OVERRUN_ERROR)
+ 	{
+ 		stringSend("Overrun Error Occured!\n");
+ 	}
+ 	
+ 	if(temp & BREAK_ERROR)
+ 	{
+ 		stringSend("Break Error occured!\n");
+ 	}
+ 	
+ 	if(temp & FRAME_ERROR)
+ 	{
+ 		stringSend("Frame Error occured!\n");
+ 	}
+ 	
+ 	/* Clear the error flags by writing to error clear register*/
+ 	UART0_ECR_R = 0;
+ 	
+ 	/* Extract the data field */ 	
+ 	data = temp & DATA_BITS;
+ 	
+ 	return data;
+
+ }
+ 
+ 
+ /*
+ * Function : loopTest
+ *
+ * Description : Receive a character from the pc through UART0 and
+ *
+ * send it to the pc to form a loopback test
+ *
+ * Notes : This function is specific to the EK-TM4C1294XL board.
+ *
+ * Returns : None
+ */
+ 
+ void loopTest(void)
+ {
+ 	char data;
+ 	
+ 	if(UART0_FR_R & RXFFULL)
+ 	{
+ 		data = charReceive();
+ 		
+ 		charSend(data);
+ 		
+ 		stringSend("\n");
+ 		
+ 	}
+ 
+ }
