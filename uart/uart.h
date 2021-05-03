@@ -20,6 +20,8 @@
 #define FRAME_ERROR 0x00000100
 #define DATA_BITS 0x000000FF
 #define RXFFULL 0x00000040
+#define RXFEMPTY 0x00000010
+#define TXFFULL 0x00000020
 
 void uartInit(void);
 
@@ -30,5 +32,7 @@ void stringSend(char data[]);
 char charReceive(void);
 
 void loopTest(void);
+
+void stringReceive(char * data, uint16_t * count, char header, char footer);
 
 #endif

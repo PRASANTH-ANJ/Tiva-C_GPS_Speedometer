@@ -59,8 +59,10 @@
  	/* Write fractional portion of BRD */
  	UART0_FBRD_R = 0x2B; // refer to baud rate divisor calculation equation on page 1165.
  	
- 	/* Configure the desired serial parameters */
- 	UART0_LCRH_R = 0x60;
+ 	/* Configure the desired serial parameters 
+ 			8-bits data length
+ 			FIFO enabled */
+ 	UART0_LCRH_R |= 0x00000070;
  	
  	/* Enable UART */
  	UART0_CTL_R |= EN_UART;
@@ -72,15 +74,19 @@
  *
  * Description : Send the character to the pc through UART0
  *
+ * Parameters : 
+ *		
+ *		chdata -> byte data to be send.
+ *
  * Notes : This function is specific to the EK-TM4C1294XL board.
  *
  * Returns : None
  */
  
-void charSend(char data)
+void charSend(char chdata)
 {
 	/* Place the data to be transmitted in the data register */
-	UART0_DR_R = data;
+	UART0_DR_R = chdata;
 	
 	/* check for transmission complete */
 	while(UART0_FR_R & BUSY_FLAG);
@@ -93,22 +99,33 @@ void charSend(char data)
  *
  * Description : Send the string to the pc through UART0
  *
+ * Parameters : 
+ *
+ *		strdata -> pointer to the string
+ *
  * Notes : This function is specific to the EK-TM4C1294XL board.
  *
  * Returns : None
  */
 
-void stringSend(char data[])
+void stringSend(char * strdata)
 {
 
 	uint16_t i;
 	
-	for(i=0; i<strlen(data); i++)
+	for(i=0; i<strlen(strdata); i++)
 	{
 
-		charSend(data[i]);	
+		/* Place the data to be transmitted in the data register */
+		UART0_DR_R = strdata[i];	
+		
+		/* Wait here if the FIFO is full */
+		while(UART0_FR_R & TXFFULL);
 		
 	}
+	
+	/* check for transmission complete */
+	while(UART0_FR_R & BUSY_FLAG);
 
 }
 
@@ -120,7 +137,7 @@ void stringSend(char data[])
  *
  * Notes : This function is specific to the EK-TM4C1294XL board.
  *
- * Returns : None
+ * Returns : The byte data received
  */
  
  
@@ -130,7 +147,7 @@ void stringSend(char data[])
  	uint16_t temp;
  	
  	/* Variable for extracted data field from 'temp'*/
- 	char data;
+ 	char cdata;
  	
  	temp = UART0_DR_R;
  	
@@ -153,9 +170,9 @@ void stringSend(char data[])
  	UART0_ECR_R = 0;
  	
  	/* Extract the data field */ 	
- 	data = temp & DATA_BITS;
+ 	cdata = temp & DATA_BITS;
  	
- 	return data;
+ 	return cdata;
 
  }
  
@@ -165,7 +182,7 @@ void stringSend(char data[])
  *
  * Description : Receive a character from the pc through UART0 and
  *
- * send it to the pc to form a loopback test
+ * 		 send it to the pc to form a loopback test
  *
  * Notes : This function is specific to the EK-TM4C1294XL board.
  *
@@ -174,16 +191,94 @@ void stringSend(char data[])
  
  void loopTest(void)
  {
- 	char data;
+ 	char recdata;
  	
  	if(UART0_FR_R & RXFFULL)
  	{
- 		data = charReceive();
+ 		recdata = charReceive();
  		
- 		charSend(data);
+ 		charSend(recdata);
  		
  		stringSend("\n");
  		
  	}
  
  }
+ 
+ 
+ 
+ /*
+ * Function : stringReceive
+ *
+ * Description : Receive characters from the pc through UART0 and store it in a char array 
+ *
+ * 		 to form a string. The string is made with characters that come after a given start character
+ *
+ * 		 'header' and terminated by a given stop character 'footer'.
+ *
+ * 		 eg.: If header : '$' and footer : '*', then $prasanth* will make the string prasanth. 
+ *
+ * Parameters: 
+ *
+ * 		str_data -> pointer to the char array, where the characters are stored
+ *		count    -> pointer to uint16_t variable, where the count of characters stored
+ *		header   -> required start character
+ *		footer	 -> required end character	
+ *
+ * Notes : This function is specific to the EK-TM4C1294XL board.
+ *
+ * Returns : None
+ */
+ 
+ void stringReceive(char str_data[], uint16_t * count, char header, char footer)
+ {
+ 	uint16_t temp, i = 0;
+ 	
+ 	while(UART0_FR_R & RXFEMPTY);
+ 	
+ 	while((UART0_DR_R & DATA_BITS) != header);
+ 	
+ 	while(UART0_FR_R & RXFEMPTY);
+ 	
+ 	temp = UART0_DR_R;
+ 	
+ 	while((temp & DATA_BITS) != footer)
+ 	{
+ 		
+ 		str_data[i] = (temp & DATA_BITS);
+ 		 		
+ 		i++;
+ 		
+ 		if(temp & (OVERRUN_ERROR | BREAK_ERROR | FRAME_ERROR))
+ 		{
+ 		 			
+ 			if(temp & OVERRUN_ERROR)
+ 			{
+		 		stringSend("Overrun Error Occured!\n");
+		 	}
+ 	
+		 	if(temp & BREAK_ERROR)
+		 	{
+		 		stringSend("Break Error occured!\n");
+		 	}
+ 	
+		 	if(temp & FRAME_ERROR)
+		 	{
+		 		stringSend("Frame Error occured!\n");
+		 	}
+		 	
+		 	break;
+ 		}
+ 		
+ 		while(UART0_FR_R & RXFEMPTY);
+ 		
+ 		temp = UART0_DR_R;
+ 		
+ 	}
+ 	
+ 	str_data[i] = '\0';
+ 	 	
+ 	*count = i;
+ 	
+ }
+ 

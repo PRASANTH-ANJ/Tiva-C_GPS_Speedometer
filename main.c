@@ -1,6 +1,12 @@
 #include "uart.h"
 #include "timer.h"
 
+
+//uint32_t  count;
+uint16_t count;
+
+char rcvdata[100];
+
 /* 
  * Function : main
  *
@@ -14,6 +20,7 @@
  
  int main (void)
  {
+ 	
  	/* Initialize the timer module for delay_ms function */
  	timerInit();
  	
@@ -22,11 +29,22 @@
  	
  	stringSend("Initialization completed \n");
  	
- 	stringSend("Entering while loop....\n");
+ 	stringSend("waiting for receiving....\n");
+ 	
  	while(1)
  	{
  	
- 		loopTest();
+ 		//stringReceive(rcvdata, &count);
+ 		
+ 		//stringSend(rcvdata);
+ 		
+ 		stringReceive(rcvdata, &count, '$', '*');
+ 		
+ 		stringSend("Received string is : ");
+ 		
+ 		stringSend(rcvdata);
+ 		
+ 		stringSend("\n");
  		
  	}
  	

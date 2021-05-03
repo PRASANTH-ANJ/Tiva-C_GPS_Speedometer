@@ -25,7 +25,7 @@ void startup()
 	 * load time location in ROM (Flash) to its run-time
 	 * location in SRAM.
 	 */
-	 
+	 uint32_t i=0;
 	 uint32_t * data_rom_start_p = &_DATA_ROM_START;
 	 uint32_t * data_ram_start_p = &_DATA_RAM_START;
 	 uint32_t * data_ram_end_p = &_DATA_RAM_END;
@@ -48,6 +48,7 @@ void startup()
 	{
 		*bss_start_p = 0;
 		bss_start_p++;
+		i++;
 	}
 	
 	/*Call the main() function.

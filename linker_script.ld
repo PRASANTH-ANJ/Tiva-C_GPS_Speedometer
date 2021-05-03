@@ -41,6 +41,8 @@ SECTIONS
 		*(.bss) /* Zero filled runtime allocated data memory */
 	}
 	
+	. = ALIGN(4);
 	_BSS_END = .;
 	__bss_end__ = .;
+	
 }
