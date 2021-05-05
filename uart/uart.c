@@ -267,6 +267,9 @@ void stringSend(char * strdata)
 		 		stringSend("Frame Error occured!\n");
 		 	}
 		 	
+		 	/* Clear the error flags by writing to error clear register*/
+ 			UART0_ECR_R = 0;
+		 	
 		 	break;
  		}
  		
@@ -281,4 +284,6 @@ void stringSend(char * strdata)
  	*count = i;
  	
  }
+ 
+ 
  
