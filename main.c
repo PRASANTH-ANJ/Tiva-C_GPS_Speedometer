@@ -2,7 +2,6 @@
 #include "timer.h"
 #include "gps.h"
 #include "nmea.h"
-#include <math.h>
 
 
 uint16_t count;

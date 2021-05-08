@@ -12,7 +12,7 @@
 #------------------------------------------------------------------------------
 include sources.mk
 
-TARGET = serial
+TARGET = gps
 
 # Architectures Specific Flags
 LINKER_FILE = linker_script.ld
