@@ -1,16 +1,16 @@
-#ifndef __UART_H__
-#define __UART_H__
+#ifndef __GPS_H__
+#define __GPS_H__
 
 #include <stdint.h>
 #include <string.h>
 #include "tm4c1294ncpdt.h"
 
 /* Macro defines*/
-#define UART0_ENABLE 0x00000001
-#define EN_PORTA 0x00000001
-#define PA0 0x01
-#define PA1 0x02
-#define ASSIGN_UART0 0x00000011
+#define UART7_ENABLE 0x00000080
+#define EN_PORTC 0x00000004
+#define PC4 0x10
+#define PC5 0x20
+#define ASSIGN_UART7 0x00110000
 #define EN_UART 0x01
 #define DIS_UART 0x00
 #define BUSY_FLAG 0x0000008
@@ -23,16 +23,14 @@
 #define RXFEMPTY 0x00000010
 #define TXFFULL 0x00000020
 
-void uartInit(void);
+// $PMTK314,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28\r\n
 
-void charSend(char);
+void gpsInit(void);
 
-void stringSend(char data[]);
+char gpsReceive(void);
 
-char charReceive(void);
+void gpsSend(char * strdata);
 
-void loopTest(void);
-
-void stringReceive(char * data, uint16_t * count, char header, char footer);
+int nmeaReceive(char str_data[], char count, char header, char footer);
 
 #endif

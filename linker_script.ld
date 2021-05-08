@@ -5,12 +5,20 @@ SECTIONS
 	{
 		*(.vectors) /* Vector Table */
 		*(.text) /* Program Code */
+		KEEP (*(.eh_frame))
 	}
 	
 	.rodata : 
 	{
 		*(.rodata) /* Read-only data */
 	}
+	
+	.ARM :
+    	{
+       	 __exidx_start = .;
+        	*(.ARM.exidx*)
+        	__exidx_end = .;
+    	}
 	
 	_DATA_ROM_START = .;
 	
@@ -26,11 +34,15 @@ SECTIONS
 	_DATA_RAM_END = .;
 	
 	_BSS_START = .;
+	__bss_start__ = .;
 	
 	.bss :
 	{
 		*(.bss) /* Zero filled runtime allocated data memory */
 	}
 	
+	. = ALIGN(4);
 	_BSS_END = .;
+	__bss_end__ = .;
+	
 }
