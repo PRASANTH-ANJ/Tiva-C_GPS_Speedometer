@@ -2,17 +2,39 @@
 #include <string.h>
 #include "uart.h"
 
+
+
+/*
+ * Function : getField
+ *
+ * Description : Extract a field from the stored array of NMEA sentenses ('rcvdata')
+ *		by counting the comas in the string.
+ *			
+ * Parameters : 
+ *		value -> pointer to the storage array
+ *
+ *		field -> index of required field. See 'nmea.h' macro defenitions for field values.
+ *
+ * Notes : This function is specific to the TM4C1294NCPDT controller.
+ *	   If the overflow of GPS UART happens, case-1 or case-2 will be considered.
+ *
+ * Returns : None
+ */
+
 int getField(char * value, char field)
 {
 	uint16_t i = 0, j = 0, count = 0;
 	
 	char head[] = "GPGGA";
 	
+	/* case-1 : Checking whether the stored nmea string starts with expected header or not. */
 	if(strncmp(head, rcvdata, 5))
 	{
+		/* Something went wrong. Terminate the function */
 		return 1;
 	}
 	
+	/* Counting the ',' character in the string to correctly index to the field */
 	for( ; count < field; i++)
 	{
 	
@@ -23,20 +45,25 @@ int getField(char * value, char field)
 		
 		}
 		
+		/* case-2 : String contains null in an unexpected area,
+		   either due to an invalid field index or due to GPS UART receiver error */
 		else if(rcvdata[i] == '\0')
 		{
 		
 			value[0] = '\0';
 			
+			/* Something went wrong. Terminate the function */
 			return 1;
 		
 		}
 	
 	}
 	
+	/* Starting of the requird field found. Now extract the filed characters */
 	while(rcvdata[i] != ',')
 	{
-	
+		
+		/* Storing each character in to the array*/
 		value[j] = rcvdata[i];
 		
 		j++;
@@ -55,6 +82,19 @@ int getField(char * value, char field)
 
 
 
+/*
+ * Function : getlocalTime
+ *
+ * Description : Extract the UTC time from NMEA sentense. Then convert it in to 
+ *		local time (+5:30 here), before storing in to the respective array.
+ *			
+ * Parameters : None
+ *
+ * Notes : This function is specific to the TM4C1294NCPDT controller.
+ *
+ * Returns : None
+ */
+
 void getlocalTime(void)
 {
 	
@@ -62,9 +102,11 @@ void getlocalTime(void)
 	
 	char localtime[10];
 	
+	/* Extract the UTC time field values */
 	if(!getField(time, TIME_INDEX))
 	{
 		
+		/* Convert the characters to numbers for localtime calculation */
 		temp = ((time[2] - '0') * 10) + (time[3] - '0') + 30;
 		
 		mm = temp % 60;
@@ -140,17 +182,42 @@ void getlocalTime(void)
 		
 		localtime[8] = '\0';
 		
+		/* Send it to the pc */
 		stringSend(localtime);
 		
 		stringSend(" ");
 		
-	}	
+	}
+	else
+	{
+		
+		/* Error occured*/
+		localtime[0] = '\0';
+		
+	}
+		
 		
 }
 
 
+
+
+
+/*
+ * Function : getSpeed
+ *
+ * Description : Extract the speed in Kmph from NMEA sentense. Then store it and send to pc. 
+ *			
+ * Parameters : None
+ *
+ * Notes : This function is specific to the TM4C1294NCPDT controller.
+ *
+ * Returns : None
+ */
+
 void getSpeed(void)
 {
+	/* Extract speed data */
 	if(!getField(speed, SPEED_INDEX))
 	{
 		
@@ -159,101 +226,60 @@ void getSpeed(void)
 		stringSend(" Km/h ");
 		
 	}
+	else
+	{
+		
+		/* Error occured*/
+		speed[0] = '\0';
+		
+	}
 }
 
 
+
+
+/*
+ * Function : getLatitude
+ *
+ * Description : Extract the Latitude data from NMEA sentense. Then store it and send to pc. 
+ *			
+ * Parameters : None
+ *
+ * Notes : This function is specific to the TM4C1294NCPDT controller.
+ *
+ * Returns : None
+ */
 
 void getLatitude(void)
 {
 	char latstring[15];
 	
-	int deg, min;
+	/* Get the N/S character from the gps data */
+	getField(ns, N_S_INDEX);
 	
-	//float templat, tempmin;
-	
-	uint16_t sec;
-	
-	getField(ns, 3);
-	
+	/* Get the Latitude data */
 	if(!getField(latitude, LATITUDE_INDEX))
 	{
+		/* Formating the string for display */
+		latstring[0] = latitude[0];
 		
-		deg =  ((latitude[0] - '0') * 10) + (latitude[1] - '0');
-		
-		min = ((latitude[2] - '0') * 10) + (latitude[3] - '0');
-		
-		sec = ((latitude[5] - '0') * 1000) + ((latitude[6] - '0') * 100) + ((latitude[7] - '0') * 10) + (latitude[8] - '0');
-		
-		/*
-		
-		
-		
-		tempmin = (float)((float)(min + (float)(sec/10000))/60);
-		
-		templat = (float)(deg + tempmin);
-		
-		deg = (int)templat;
-		
-		tempmin = (float)(templat - deg);
-		
-		min = tempmin * 1000000;
-		
-		
-		
-		
-		
-		
-		latstring[0] = (deg / 10) + '0';
-		
-		latstring[1] = (deg % 10) + '0';
-		
-		latstring[2] = '.';
-		
-		latstring[3] = (min / 100000) + '0';
-		
-		min = min % 100000;
-		
-		latstring[4] = (min / 10000) + '0';
-		
-		min = min % 10000;
-		
-		latstring[5] = (min / 1000) + '0';
-		
-		min = min % 1000;
-		
-		latstring[6] = (min / 100) + '0';
-		
-		min = min % 100;
-		
-		latstring[7] = (min / 10) + '0';
-		
-		latstring[8] = (min % 10) + '0';
-		
-		*/
-		
-		latstring[0] = (deg / 10) + '0';
-		
-		latstring[1] = (deg % 10) + '0';
+		latstring[1] = latitude[1];
 		
 		latstring[2] = 'd'; 
 		
-		latstring[3] = (min / 10) + '0';
+		latstring[3] = latitude[2];
 		
-		latstring[4] = (min % 10) + '0';
+		latstring[4] = latitude[3];
 		
 		latstring[5] = (char)0x2E;
 		
-		latstring[6] = (sec / 1000) + '0';
+		latstring[6] = latitude[5];
 		
-		sec = sec % 1000;
+		latstring[7] = latitude[6];
 		
-		latstring[7] = (sec / 100) + '0';
+		latstring[8] = latitude[7];
 		
-		sec = sec % 100;
-		
-		latstring[8] = (sec / 10) + '0';
-		
-		latstring[9] = (sec % 10) + '0';
+		latstring[9] = latitude[8];
 		
 		latstring[10] = 'm';
 		
@@ -268,106 +294,66 @@ void getLatitude(void)
 		stringSend(" ");
 		
 	}
+	else
+	{
+		
+		/* Error occured*/
+		latitude[0] = '\0';
+		
+		latstring[0] = '\0';
+		
+	}
+	
 }
 
 
 
 
+
+
+/*
+ * Function : getLongitude
+ *
+ * Description : Extract the Longitude data from NMEA sentense. Then store it and send to pc. 
+ *			
+ * Parameters : None
+ *
+ * Notes : This function is specific to the TM4C1294NCPDT controller.
+ *
+ * Returns : None
+ */
+
 void getLongitude(void)
 {
 	char lonstring[16];
 	
-	int deg, min;
-	
-	//float templat, tempmin;
-	
-	uint16_t sec;
-	
-	getField(ew, 5);
+	/* Get the E/W character */
+	getField(ew, E_W_INDEX);
 	
 	if(!getField(longitude, LONGITUDE_INDEX))
 	{
+	
+		lonstring[0] = longitude[0];
 		
-		deg =  ((longitude[0] - '0') * 100) + ((longitude[1] - '0') * 10) + (longitude[2] - '0');
+		lonstring[1] = longitude[1];
 		
-		min = ((longitude[3] - '0') * 10) + (longitude[4] - '0');
-		
-		sec = ((longitude[6] - '0') * 1000) + ((longitude[7] - '0') * 100) + ((longitude[8] - '0') * 10) + (longitude[9] - '0');
-		
-		/*
-		
-		
-		
-		tempmin = (float)((float)(min + (float)(sec/10000))/60);
-		
-		templat = (float)(deg + tempmin);
-		
-		deg = (int)templat;
-		
-		tempmin = (float)(templat - deg);
-		
-		min = tempmin * 1000000;
-		
-		
-		
-		
-		
-		
-		latstring[0] = (deg / 10) + '0';
-		
-		latstring[1] = (deg % 10) + '0';
-		
-		latstring[2] = '.';
-		
-		latstring[3] = (min / 100000) + '0';
-		
-		min = min % 100000;
-		
-		latstring[4] = (min / 10000) + '0';
-		
-		min = min % 10000;
-		
-		latstring[5] = (min / 1000) + '0';
-		
-		min = min % 1000;
-		
-		latstring[6] = (min / 100) + '0';
-		
-		min = min % 100;
-		
-		latstring[7] = (min / 10) + '0';
-		
-		latstring[8] = (min % 10) + '0';
-		
-		*/
-		
-		lonstring[0] = (deg / 100) + '0';
-		
-		deg = (deg % 100);
-		
-		lonstring[1] = (deg /10) + '0';
-		
-		lonstring[2] = (deg % 10) + '0';
+		lonstring[2] = longitude[2];
 		
 		lonstring[3] = 'd'; 
 		
-		lonstring[4] = (min / 10) + '0';
+		lonstring[4] = longitude[3];
 		
-		lonstring[5] = (min % 10) + '0';
+		lonstring[5] = longitude[4];
 		
 		lonstring[6] = (char)0x2E;
 		
-		lonstring[7] = (sec / 1000) + '0';
+		lonstring[7] = longitude[6];
 		
-		sec = sec % 1000;
+		lonstring[8] = longitude[7];
 		
-		lonstring[8] = (sec / 100) + '0';
+		lonstring[9] = longitude[8];
 		
-		sec = sec % 100;
-		
-		lonstring[9] = (sec / 10) + '0';
-		
-		lonstring[10] = (sec % 10) + '0';
+		lonstring[10] = longitude[9];
 		
 		lonstring[11] = 'm';
 		
@@ -382,6 +368,15 @@ void getLongitude(void)
 		stringSend(" ");
 		
 	}
+	else
+	{
+		/* Error occured*/
+		longitude[0] = '\0';
+		
+		lonstring[0] = '\0';
+		
+	}
+	
 }
 
 

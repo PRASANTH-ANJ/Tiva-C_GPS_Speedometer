@@ -5,7 +5,6 @@
 #include <math.h>
 
 
-//uint32_t  count;
 uint16_t count;
 
 /* Global variables to recieve data */
@@ -14,11 +13,14 @@ char rcvdata[200], time[10], speed[4], validity[2], latitude[15], ns[2], longitu
 /* 
  * Function : main
  *
- * Description : Get and store the NMEA string from GPS to a char ayyay and
- *		  sent the array string to the pc with the configuration below
+ * Description : Get the NMEA string from GPS module and extract its fields using different functions to
+ *		store each field in separate character arrays. Then send the array string to 
+ *		pc using following configuration:
  *			9600, 8, N, 1
  *
- * Notes : Uses the uart driver specific to the TM4C1294NCPDT Controller
+ * Notes : Uses the uart driver specific to the TM4C1294NCPDT Controller.
+ *		UART0 : interface with PC
+ *		UART7 : Interface with GPS module (Cirocomm 600L)
  *
  * Returns : Contains an infinite loop 
  */
@@ -53,28 +55,38 @@ char rcvdata[200], time[10], speed[4], validity[2], latitude[15], ns[2], longitu
  	{
  		/* Receive the required NMEA sentenses from GPS */
  		nmeaReceive(rcvdata, 2, '$', '*');
- 		
- 		//stringSend(rcvdata);
 
+		/* Get the validity field value in 'validity' array. '0' -> Invalid fix */
  		getField(validity, VALIDITY_INDEX);
  		
+ 		/* Checking whether the fix is valid or not */
  		if((validity[0] == '1') || (validity[0] == '2'))
  		{
+			/* Get the local time stored in the 'time' array
+			   and send it to the pc */
 			getlocalTime();
 						
+			/* Get the Latitude value stored in the 'latitude' array
+			   and send it to the pc */
 			getLatitude();
 			
+			/* Get the Longitude value stored in the 'longitude' array
+			   and send it to the pc */
 			getLongitude();
 			
+			/* Get the speed in Km/h stored in the 'speed' array
+			   and send it to the pc */
 			getSpeed();
 			
 			stringSend("\n");
  			
  		}
  		
+ 		/* Current fix is not valid */
  		else
  		{
  			stringSend("No GPS fix found.....");
+ 			
 	 		stringSend("\n");
  		}
 		
