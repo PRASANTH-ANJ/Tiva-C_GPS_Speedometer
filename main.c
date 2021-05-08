@@ -1,12 +1,15 @@
 #include "uart.h"
 #include "timer.h"
 #include "gps.h"
+#include "nmea.h"
+#include <math.h>
 
 
 //uint32_t  count;
 uint16_t count;
 
-char rcvdata[200];
+/* Global variables to recieve data */
+char rcvdata[200], time[10], speed[4], validity[2], latitude[15], ns[2], longitude[15], ew[2];// longitude[15];
 
 /* 
  * Function : main
@@ -51,10 +54,30 @@ char rcvdata[200];
  		/* Receive the required NMEA sentenses from GPS */
  		nmeaReceive(rcvdata, 2, '$', '*');
  		
-		stringSend(rcvdata);
+ 		//stringSend(rcvdata);
+
+ 		getField(validity, VALIDITY_INDEX);
+ 		
+ 		if((validity[0] == '1') || (validity[0] == '2'))
+ 		{
+			getlocalTime();
+						
+			getLatitude();
+			
+			getLongitude();
+			
+			getSpeed();
+			
+			stringSend("\n");
+ 			
+ 		}
+ 		
+ 		else
+ 		{
+ 			stringSend("No GPS fix found.....");
+	 		stringSend("\n");
+ 		}
 		
- 		stringSend("\n");
- 	
  	}
  	
  	return 0;

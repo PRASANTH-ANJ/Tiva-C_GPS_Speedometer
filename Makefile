@@ -26,7 +26,7 @@ LD = arm-none-eabi-ld
 OC = arm-none-eabi-objcopy
 #LDFLAGS = -Map=$(TARGET).map -T$(LINKER_FILE)
 LDFLAGS = -Wl,-Map=$(TARGET).map -T$(LINKER_FILE)
-CFLAGS = $(INCLUDES) -mcpu=$(CPU) -mthumb \
+CFLAGS = $(INCLUDES) -mcpu=$(CPU) -mthumb -mfpu=auto \
          -Wall -Werror -g -O0 --specs=$(SPECS) -std=c99
 SIZE=arm-none-eabi-size
 

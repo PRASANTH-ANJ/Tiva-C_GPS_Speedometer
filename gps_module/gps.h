@@ -31,6 +31,6 @@ char gpsReceive(void);
 
 void gpsSend(char * strdata);
 
-void nmeaReceive(char str_data[], char count, char header, char footer);
+int nmeaReceive(char str_data[], char count, char header, char footer);
 
 #endif

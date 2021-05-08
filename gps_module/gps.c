@@ -183,7 +183,7 @@
  */
 
 
-void nmeaReceive(char str_data[], char count, char header, char footer)
+int nmeaReceive(char str_data[], char count, char header, char footer)
  {
  	uint16_t temp, i = 0, j;
  	
@@ -240,9 +240,8 @@ void nmeaReceive(char str_data[], char count, char header, char footer)
  				str_data[0] = '\0';
  				
  				/* Terminating the function */
- 				count = 0;
-		 	
-			 	break;
+			 	return 0;
+			 	
  			}
  		
  			while(UART7_FR_R & RXFEMPTY);
@@ -266,6 +265,8 @@ void nmeaReceive(char str_data[], char count, char header, char footer)
  	
  	/* Don't forget to put a null character at the end of the string */
  	str_data[i] = '\0';
+ 	
+ 	return 0;
  	
  }
 
