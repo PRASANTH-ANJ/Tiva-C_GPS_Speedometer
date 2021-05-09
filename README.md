@@ -23,4 +23,4 @@ UART : UART0 (Communication with PC), UART7 (GPS module interface)
        Configuration: 9600 8 N 1
        
        
-Use the master branch for both the OLED and UART (PC communication) functionalities. If only the PC communication is required, use the 
+Use the master branch for both the OLED and UART (PC communication) functionalities. If only the PC communication is required, use the Serial_pc_uart branch.
