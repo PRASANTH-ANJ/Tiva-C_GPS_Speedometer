@@ -24,3 +24,6 @@ UART : UART0 (Communication with PC), UART7 (GPS module interface)
        
        
 Use the master branch for both the OLED and UART (PC communication) functionalities. If only the PC communication is required, use the Serial_pc_interface branch.
+
+
+Happy coding to all.
