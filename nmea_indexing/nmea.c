@@ -1,6 +1,8 @@
 #include "nmea.h"
 #include <string.h>
 #include "uart.h"
+#include "ssd1306.h"
+#include "ugui.h"
 
 
 
@@ -183,9 +185,13 @@ void getlocalTime(void)
 		localtime[8] = '\0';
 		
 		/* Send it to the pc */
-		stringSend(localtime);
+		//stringSend(localtime);
 		
-		stringSend(" ");
+		//stringSend(" ");
+		
+		UG_PutString(0, 0, localtime);
+	
+		display(display_buffer);
 		
 	}
 	else
@@ -221,9 +227,15 @@ void getSpeed(void)
 	if(!getField(speed, SPEED_INDEX))
 	{
 		
-		stringSend(speed);
+		//stringSend(speed);
 		
-		stringSend(" Km/h ");
+		//stringSend(" Km/h ");
+		
+		UG_PutString(72, 0, speed);
+		
+		UG_PutString(104, 0, "Km");
+	
+		display(display_buffer);
 		
 	}
 	else
@@ -289,9 +301,13 @@ void getLatitude(void)
 		
 		latstring[13] = '\0';
 		
-		stringSend(latstring);
+		//stringSend(latstring);
 		
-		stringSend(" ");
+		//stringSend(" ");
+		
+		UG_PutString(0, 12, latstring);
+	
+		display(display_buffer);
 		
 	}
 	else
@@ -363,9 +379,13 @@ void getLongitude(void)
 		
 		lonstring[14] = '\0';
 		
-		stringSend(lonstring);
+		//stringSend(lonstring);
 		
-		stringSend(" ");
+		//stringSend(" ");
+		
+		UG_PutString(0, 24, lonstring);
+	
+		display(display_buffer);
 		
 	}
 	else
