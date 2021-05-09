@@ -2,8 +2,8 @@
 Tiva C launchpad based GPS Speedometer for bicycles.
 
 Hi all,
-This is my first repository related to embedded systems development with ARM Cortex-M4 microcontrollers. You can use this repository to make GPS location finder
-with the Cirocomm 600L module and ssd1306 based OLED module. It can also be used as a reference to the startup file, make file, linkerscript and for the driver
+This is my first repository related to embedded systems development with ARM Cortex-M4 microcontrollers. You can use this repository to make GPS based speedometer
+with the Cirocomm 600L module and ssd1306 based OLED module. The coding and development has been done on an EK-TM4C1294XL evaluation board.  It can also be used as a reference to the startup file, make file, linkerscript and for the driver
 library files of the following modules :
 
     *32-bit timer peripheral
