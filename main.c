@@ -89,7 +89,8 @@ uint8_t display_buffer[LCDHEIGHT * LCDWIDTH / 8] = {
  	/* Initialize the OLED module */
 	init_ssd1306();
 	
-	clear();
+	
+	clearBuffer();
 	
 	
 	
@@ -101,13 +102,17 @@ uint8_t display_buffer[LCDHEIGHT * LCDWIDTH / 8] = {
 	
 	UG_PutString(0, 0, "Initialization Completed! \n");
 	
+	clearDisplay();
+	
 	display(display_buffer);
 	
 	delay_ms(1000);
 	
-	clear();
+	clearBuffer();
 	
 	UG_PutString(0, 0, "Initializing GPS... \n");
+	
+	clearDisplay();
 	
 	display(display_buffer);
 	
@@ -137,9 +142,11 @@ uint8_t display_buffer[LCDHEIGHT * LCDWIDTH / 8] = {
  	
  	delay_ms(1000);
 	
-	clear();
+	clearBuffer();
 	
 	UG_PutString(0, 0, "Waiting for GPS data... \n");
+	
+	clearDisplay();
 	
 	display(display_buffer);
  	
@@ -157,7 +164,7 @@ uint8_t display_buffer[LCDHEIGHT * LCDWIDTH / 8] = {
  		if((validity[0] == '1') || (validity[0] == '2'))
  		{
  		
- 			clear();
+ 			clearBuffer();
  			
 			/* Get the local time stored in the 'time' array
 			   and send it to the pc */
@@ -175,7 +182,8 @@ uint8_t display_buffer[LCDHEIGHT * LCDWIDTH / 8] = {
 			   and send it to the pc */
 			getLongitude();
 			
-			//display(display_buffer);
+			clearDisplay();
+			display(display_buffer);
 			
 			//stringSend("\n");
  			
@@ -184,10 +192,12 @@ uint8_t display_buffer[LCDHEIGHT * LCDWIDTH / 8] = {
  		/* Current fix is not valid */
  		else
  		{
- 			clear();
+ 			clearBuffer();
  			
  			UG_PutString(0, 0, "No GPS fix found.....!");
-	
+			
+			clearDisplay();
+			
 			display(display_buffer);
  			
  			stringSend("No GPS fix found.....");

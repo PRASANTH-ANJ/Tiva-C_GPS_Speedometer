@@ -288,9 +288,9 @@ void display(uint8_t * buffer){
 
 
 /*
- * Function : clear
+ * Function : clearDisplay
  *
- * Description : Clear the buffer array (write 0x00 to all locations).
+ * Description : Clear GDDRAM of the display (write 0x00 to all locations).
  *
  * Notes : This function is specific to the I2C module in TM4C1294NCPDT controller and to the SSD1306 command set.
  *
@@ -298,9 +298,9 @@ void display(uint8_t * buffer){
  */
 
 
-void clear(void){
+void clearDisplay(void){
 	
-	/************** First clear the GDDRAM *************/
+	/************** Clear the GDDRAM *************/
 	/* Setting OLED address (0x3C) and setting controller in transmit mode*/
 	I2C2_MSA_R |= ((OLED_ADDRESS << 1) | TRANSMIT_MODE);
 	
@@ -333,16 +333,29 @@ void clear(void){
 	while((I2C2_MCS_R & BUSY) == 0);
 	
 	while((I2C2_MCS_R & BUSY) == 1); // Checking the transmittion end.
+	
+}
 
 
-	/***************** Secondly clear the local display buffer***************/
+
+
+/*
+ * Function : clearDisplay
+ *
+ * Description : Clear GDDRAM of the display (write 0x00 to all locations).
+ *
+ * Notes : This function is specific to the I2C module in TM4C1294NCPDT controller and to the SSD1306 command set.
+ *
+ * Returns : None.
+ */
+
+void clearBuffer(void){
+	/***************** Clear the local display buffer***************/
 	for(uint16_t i = 0; i < (LCDHEIGHT * LCDWIDTH / 8); i++){
 		
 		display_buffer[i] = 0x00;	
 		
 	}
-	
-	display(display_buffer);
 	
 }
 
@@ -438,7 +451,7 @@ void init_ssd1306(void){
     		
     	}
     	
-    	clear();
+    	clearDisplay();
     	
     /* Re-set contrast to normal value */
 	OLED_command(0x81);                    // SETCONTRAST          0x81
