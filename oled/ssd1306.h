@@ -46,7 +46,9 @@ void OLED_data(uint8_t data);
 
 void display(uint8_t *);
 
-void clear(void);
+void clearDisplay(void);
+
+void clearBuffer(void);
 
 
 #endif 

@@ -191,7 +191,7 @@ void getlocalTime(void)
 		
 		UG_PutString(0, 0, localtime);
 	
-		display(display_buffer);
+		//display(display_buffer);
 		
 	}
 	else
@@ -235,7 +235,7 @@ void getSpeed(void)
 		
 		UG_PutString(104, 0, "Km");
 	
-		display(display_buffer);
+		//display(display_buffer);
 		
 	}
 	else
@@ -307,7 +307,7 @@ void getLatitude(void)
 		
 		UG_PutString(0, 12, latstring);
 	
-		display(display_buffer);
+		//display(display_buffer);
 		
 	}
 	else
@@ -385,7 +385,7 @@ void getLongitude(void)
 		
 		UG_PutString(0, 24, lonstring);
 	
-		display(display_buffer);
+		//display(display_buffer);
 		
 	}
 	else
